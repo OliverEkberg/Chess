@@ -1,13 +1,7 @@
 package game;
 
-import java.io.Serializable;
-
-public class Coordinate implements Serializable{
+public class Coordinate {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	public int x;
 	public int y;
 	
@@ -15,15 +9,23 @@ public class Coordinate implements Serializable{
 		this.x = x;
 		this.y = y;
 	}
-	
-	public String toString(){
-		return "[" + x + "," + y + "]";
-	}
-	
+
+	/**
+	 * Compares coordinates
+	 * @param coord
+	 * @return
+	 */
 	public boolean equals(Coordinate coord){
 		return this.x == coord.x && this.y == coord.y;
 	}
 	
+	
+	/**
+	 * Gets move in direction d with length moveLen
+	 * @param d
+	 * @param moveLen
+	 * @return
+	 */
 	public Coordinate getMove(Direction d, int moveLen){
 		
 		switch(d) {
@@ -50,6 +52,12 @@ public class Coordinate implements Serializable{
 		}
 		
 	}
+	
+	/**
+	 * Gets move in direction d with length 1
+	 * @param d
+	 * @return
+	 */
 	public Coordinate getMove(Direction d){
 		return getMove(d, 1);
 	}

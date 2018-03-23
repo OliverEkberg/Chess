@@ -5,69 +5,129 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import json.Commands;
+import json.DrawPiece;
+import json.Positions;
+
 public class ClientSocketThread extends Thread{
 
+	public static HashMap<PlayerColor, ClientSocketThread> clientList = new HashMap<>(2);
+	public static PlayerColor playerTurn = PlayerColor.WHITE;
+
+	/*
+	 * Defining IO
+	 */
 	private BufferedReader in;
 	private PrintWriter out;
+
+
 	Gson gson = new GsonBuilder().serializeNulls().create();
 
-	public static ArrayList<ClientSocketThread> clientList = new ArrayList<>(2);
 
-	public ClientSocketThread(Socket socket) throws IOException {
+	public PlayerColor playerColor;
+	public Coordinate selectedCoord = null;
+
+
+
+
+
+
+	public ClientSocketThread(Socket socket, PlayerColor playerColor) throws IOException {
+
+		//Create IO
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		out = new PrintWriter(socket.getOutputStream(), true);
+
+
+		this.playerColor = playerColor;
+
+		sendPositions(this);
+
+
 	} 
 
 	public void run(){
-		String msgFromClient = null;
+		String json = null;
 
 		while(true){
 			try {
-				msgFromClient = in.readLine();
+				json = in.readLine();
 
-				Json json = gson.fromJson(msgFromClient, Json.class);
-				json.afterParsing();
+				//Player needs to have turn
+				if(playerTurn.equals(playerColor)) {
 
+					//Parsing JSON
+					Coordinate clickedCoordinate = gson.fromJson(json, Coordinate.class);
 
-				boolean moved = false;
+					boolean moved = false;
 
-				if(json.selectedCoord != null && !Piece.isEmpty(json.selectedCoord)){
-					if(Piece.isOwnedBy(json.selectedCoord,json.playerTurn)){
-						Piece selectedPiece = Piece.getPiece(json.selectedCoord);
-						if(selectedPiece.isMovable(json.clickedCoordinate)){
-							selectedPiece.move(json.clickedCoordinate);
-							json.playerTurn = (json.playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
-							moved = true;
+					if(selectedCoord != null && !Piece.isEmpty(selectedCoord)){
 
+						//Piece needs to be owned by player with turn
+						if(Piece.isOwnedBy(selectedCoord,playerTurn)){
+
+							Piece selectedPiece = Piece.getPiece(selectedCoord);
+
+							//Piece needs to have possible moves
+							if(selectedPiece.isMovable(clickedCoordinate)){
+
+								selectedPiece.move(clickedCoordinate);
+								playerTurn = (playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE; //Switch turn
+								moved = true;
+
+							}
 						}
 					}
+
+					selectedCoord = moved ? null : clickedCoordinate; //If moved none will be selected
+
+					if(moved) {
+						sendPositionsBoth();
+					}
+
 				}
-
-				//If moved no coordinate shall be selected
-				json.selectedCoord = moved ? null : json.clickedCoordinate;
-
-				json.beforeParsing();
-				String returnJson = gson.toJson(json);
-				
-				//Send to both players
-				for (ClientSocketThread clientSocketThread : clientList) {
-					clientSocketThread.writeToClient(returnJson);
-				}
-
-
 			} catch (IOException e){}
 
 		}
 	}
 
-	public void writeToClient(String msg){
 
-		if(msg != null)  // Vägra skicka null
+	/**
+	 * Sends positions to client
+	 * @param client
+	 */
+	public void sendPositions(ClientSocketThread client) {
+		Positions p = new Positions();
+
+		for (Piece piece : Piece.pieces) {
+			p.positionList.add(new DrawPiece(piece.coord, piece.color, piece.toString()));
+		}
+
+		String returnJson = Commands.Positions.toString()+"_";
+		returnJson += gson.toJson(p);
+		client.writeToClient(returnJson);
+	}
+
+	/**
+	 * Sends positions to both
+	 */
+	private void sendPositionsBoth() {
+		sendPositions(clientList.get(PlayerColor.BLACK));
+		sendPositions(clientList.get(PlayerColor.WHITE));
+	}
+
+
+	/**
+	 * Sends msg to the client. Will not send null
+	 * @param msg
+	 */
+	private void writeToClient(String msg){
+		if(msg != null) 
 			out.println(msg);
 	}
 }
