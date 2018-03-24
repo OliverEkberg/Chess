@@ -26,7 +26,6 @@ public class Client {
 		return color;
 	}
 	
-	
 	public void send(String str) {
 		thread.writeToClient(str);
 	}

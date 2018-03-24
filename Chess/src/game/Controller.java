@@ -69,7 +69,7 @@ public class Controller extends Thread{
 					switch (command) {
 					case Positions:  
 						
-						positions = gson.fromJson(json, Positions.class).positionList;
+						positions = gson.fromJson(json, Positions.class).getPositionList();
 						theView.render(positions);
 						
 						break;

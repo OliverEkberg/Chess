@@ -120,6 +120,8 @@ public abstract class Piece {
 	 * @return
 	 */
 	public static boolean isEmpty(Coordinate coord){
+		
+		
 		for(Piece piece : pieces)
 			if(piece.getCoordinate().equals(coord))
 				return false;
@@ -135,7 +137,10 @@ public abstract class Piece {
 	 * @param playerTurn
 	 * @return
 	 */
-	public static boolean isOwnedBy(Coordinate c, PlayerColor player) {
+	public static boolean isOwnedBy(Coordinate c, PlayerColor player){
+		if(c == null || isEmpty(c)) {
+			return false;
+		}
 		return getPiece(c).color.equals(player);
 	}
 

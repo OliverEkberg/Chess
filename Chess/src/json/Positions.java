@@ -2,10 +2,16 @@ package json;
 
 import java.util.ArrayList;
 
-import game.PlayerColor;
-
 
 public class Positions {
-	public PlayerColor playerTurn = PlayerColor.WHITE;
-	public ArrayList<DrawPiece> positionList = new ArrayList<>();
+	private ArrayList<DrawPiece> positionList = new ArrayList<>();
+	
+	public ArrayList<DrawPiece> getPositionList(){
+		return positionList;
+	}
+	
+	public void addPosition(DrawPiece drawPiece) {
+		positionList.add(drawPiece);
+	}
+	
 }

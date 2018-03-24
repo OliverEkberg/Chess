@@ -159,8 +159,8 @@ public class View extends JFrame implements MouseListener{
 	 */
 	private void drawPieces(Graphics g, ArrayList<DrawPiece> pieces) {
 		for (DrawPiece drawPiece : pieces) {
-			Image image = images.get(drawPiece.p + "_" + drawPiece.type);
-			g.drawImage(image, drawPiece.c.x*100, drawPiece.c.y*100, null);
+			Image image = images.get(drawPiece.getPlayerColor() + "_" + drawPiece.getType());
+			g.drawImage(image, drawPiece.getCoord().x*100, drawPiece.getCoord().y*100, null);
 		}	
 	}
 
@@ -176,12 +176,12 @@ public class View extends JFrame implements MouseListener{
 		int d = 90;
 		Color c = new Color(0,0,255,40);
 		g.setColor(c);
-		g.fillOval(markers.selected.x*tileWidth+tileWidth/2 - Math.round(d/2), markers.selected.y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
+		g.fillOval(markers.getSelected().x*tileWidth+tileWidth/2 - Math.round(d/2), markers.getSelected().y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
 
 		/*
 		 * Enemy markers
 		 */
-		for (Coordinate coord : markers.enemyMoves) {
+		for (Coordinate coord : markers.getEnemyMoves()) {
 			d = 90;
 			c = new Color(255,0,0,40);
 			g.setColor(c);
@@ -191,7 +191,7 @@ public class View extends JFrame implements MouseListener{
 		/*
 		 * Empty markers
 		 */
-		for (Coordinate coord : markers.freeMoves) {
+		for (Coordinate coord : markers.getFreeMoves()) {
 			d = Math.round(tileWidth/5);
 			c = Color.blue;
 			g.setColor(c);
