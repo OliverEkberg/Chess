@@ -1,8 +1,6 @@
 package game;
 
 
-
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -20,9 +18,7 @@ import javax.swing.JFrame;
 
 import images.ResourceLoader;
 import json.DrawPiece;
-
-
-
+import json.Markers;
 
 
 public class View extends JFrame implements MouseListener{  
@@ -39,7 +35,7 @@ public class View extends JFrame implements MouseListener{
 	private Canvas gameCanvas;  
 	private int canvasWidth = 800;
 	private int canvasHeight = 800;
-	public static HashMap<String, Image> images = new HashMap<>();
+	public HashMap<String, Image> images = new HashMap<>();
 
 
 	/*
@@ -74,9 +70,7 @@ public class View extends JFrame implements MouseListener{
 		backBuffer = gameCanvas.getBufferStrategy();
 	}  
 
-	/*
-	 * Renders everything
-	 */
+
 	public void render(ArrayList<DrawPiece> pieces){  
 		Graphics2D g = (Graphics2D)backBuffer.getDrawGraphics();
 
@@ -86,6 +80,19 @@ public class View extends JFrame implements MouseListener{
 		g.dispose();
 		backBuffer.show();
 	}  
+	public void render(ArrayList<DrawPiece> pieces, Markers markers){  
+		Graphics2D g = (Graphics2D)backBuffer.getDrawGraphics();
+
+		drawTiles(g);
+		drawMarkers(g, markers);
+		drawPieces(g, pieces);
+
+		g.dispose();
+		backBuffer.show();
+	}  
+
+
+
 
 	@Override
 	public synchronized void mouseClicked(MouseEvent e) {
@@ -112,7 +119,7 @@ public class View extends JFrame implements MouseListener{
 
 
 
-	public static void loadImages() {
+	private void loadImages() {
 		images.put("BLACK_horse", ResourceLoader.getImage("BLACK_horse.png"));
 		images.put("BLACK_king", ResourceLoader.getImage("BLACK_king.png"));
 		images.put("BLACK_pawn", ResourceLoader.getImage("BLACK_pawn.png"));
@@ -144,7 +151,6 @@ public class View extends JFrame implements MouseListener{
 				g.fillRect(x*tileWidth, y*tileWidth, tileWidth, tileWidth);
 
 			}
-
 		}
 	}
 
@@ -158,6 +164,44 @@ public class View extends JFrame implements MouseListener{
 		}	
 	}
 
+	/*
+	 * Draws all the markers
+	 */
+	private void drawMarkers(Graphics g, Markers markers) {
+		int tileWidth = 100;
+
+		/*
+		 * Selected marker
+		 */
+		int d = 90;
+		Color c = new Color(0,0,255,40);
+		g.setColor(c);
+		g.fillOval(markers.selected.x*tileWidth+tileWidth/2 - Math.round(d/2), markers.selected.y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
+
+		/*
+		 * Enemy markers
+		 */
+		for (Coordinate coord : markers.enemyMoves) {
+			d = 90;
+			c = new Color(255,0,0,40);
+			g.setColor(c);
+			g.fillOval(coord.x*tileWidth+tileWidth/2 - Math.round(d/2), coord.y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
+		}
+
+		/*
+		 * Empty markers
+		 */
+		for (Coordinate coord : markers.freeMoves) {
+			d = Math.round(tileWidth/5);
+			c = Color.blue;
+			g.setColor(c);
+			g.fillOval(coord.x*tileWidth+tileWidth/2 - Math.round(d/2), coord.y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
+		}
+
+
+	}
+
+
 	public static void main(String[] args) throws UnknownHostException, InterruptedException, IOException {
 
 		String ipAdress = "127.0.0.1";
@@ -165,6 +209,9 @@ public class View extends JFrame implements MouseListener{
 
 		new View(ipAdress, Integer.parseInt(sPort));
 	}
+
+
+
 
 
 }

@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import json.Commands;
 import json.DrawPiece;
+import json.Markers;
 import json.Positions;
 
 public class Controller extends Thread{
 
 
-	//
 
 	Gson gson = new GsonBuilder().serializeNulls().create();
 
@@ -59,24 +60,27 @@ public class Controller extends Thread{
 
 				String msgFromServer = in.readLine();
 				
-				if(msgFromServer.length() > 10) {
+				if(msgFromServer != null && msgFromServer.length() > 10) {
 
-					String command = msgFromServer.split("_")[0];
+					Commands command = Commands.valueOf(msgFromServer.split("_")[0]);
 					String json = msgFromServer.split("_")[1];
 
 
 					switch (command) {
-					case "Positions":  
+					case Positions:  
 						
 						positions = gson.fromJson(json, Positions.class).positionList;
 						theView.render(positions);
 						
 						break;
+					
+					case Markers:
+						Markers markers = gson.fromJson(json, Markers.class);
+						theView.render(positions, markers);
+					
 					}
 
-					
-
-
+				
 
 				}
 
