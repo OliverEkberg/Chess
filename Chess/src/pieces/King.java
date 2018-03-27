@@ -23,5 +23,10 @@ public class King extends Piece {
 		directions = new Direction[]{Direction.N, Direction.NE, Direction.E, Direction.SE, Direction.S, Direction.SV, Direction.V, Direction.NV};
 		moveMax = 1;
 	}
+	
+	@Override
+	public boolean isKing() {
+		return true;
+	}
 
 }

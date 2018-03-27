@@ -106,11 +106,21 @@ public class Server {
 				/*
 				 * Moves selected piece if possible
 				 */
-				if(selectedPiece.isMovable(clickedCoordinate)){
+				if(selectedPiece.isMovable(clickedCoordinate) && !selectedPiece.isChess(clickedCoordinate)){
 					selectedPiece.move(clickedCoordinate);
 					switchTurn(client.getColor());
 					client.setSelectedCoord(clickedCoordinate);
 					sendPositions(clients);
+					
+					if(!Piece.canMakeMove(playerTurn)) {
+						if(Piece.isChess(playerTurn)) {
+							System.out.println("CHESS MATE");
+						}else {
+							System.out.println("PATT");
+						}
+						
+					}
+					
 				}
 			}
 			

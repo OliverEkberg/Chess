@@ -19,6 +19,10 @@ public class Coordinate {
 		return this.x == coord.x && this.y == coord.y;
 	}
 	
+	public String toString() {
+		return "["+x+","+y+"]";
+	}
+	
 	
 	/**
 	 * Gets move in direction d with length moveLen
