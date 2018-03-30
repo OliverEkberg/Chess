@@ -14,20 +14,21 @@ import pieces.Tower;
 public abstract class Piece {
 
 	public static ArrayList<Piece> pieces = new ArrayList<>(); //Holds all pieces
-	protected static HashMap<PlayerColor, King> kings = new HashMap<>();
 	private boolean active = true;
-
 	protected Coordinate coord;
 	public PlayerColor color;
 	protected int moveMax; //Max moving length
 	protected Direction[] directions; //Move directions
 
-
+	/**
+	 * Constructor
+	 * @param coord
+	 * @param color
+	 */
 	public Piece(Coordinate coord, PlayerColor color){
 		this.coord = coord;
 		this.color = color;
 		pieces.add(this);
-
 	}
 	
 	public void disable() {
@@ -52,7 +53,7 @@ public abstract class Piece {
 	}
 
 	/**
-	 * Returns all the possible moves for selected piece
+	 * Returns all the possible moves
 	 * @return
 	 */
 	public ArrayList<Coordinate> isMovableAll(){
@@ -139,11 +140,18 @@ public abstract class Piece {
 	 */
 	public static boolean isChess(PlayerColor playerColor) {
 
+		Piece king = null;
+		for(Piece p : pieces) {
+			if(p.isKing() && p.color == playerColor) {
+				king = p;
+			}
+		}
+		
 		for (Piece p : pieces) {
 			//Only enemies is used
 			if(p.color != playerColor) {
 				//If anyone can move to the king it's chess
-				if(p.isMovable(kings.get(playerColor).coord)) {	
+				if(p.isMovable(king.coord)) {	
 					return true;
 				}
 			}
@@ -245,7 +253,7 @@ public abstract class Piece {
 		new Horse(6,0,PlayerColor.WHITE);
 		new Runner(2,0,PlayerColor.WHITE);
 		new Runner(5,0,PlayerColor.WHITE);
-		kings.put(PlayerColor.WHITE,new King(4,0,PlayerColor.WHITE));
+		new King(4,0,PlayerColor.WHITE);
 		new Queen(3,0,PlayerColor.WHITE);
 
 		for(int x = 0; x < 8; x++) {
@@ -259,7 +267,7 @@ public abstract class Piece {
 		new Horse(6,7,PlayerColor.BLACK);
 		new Runner(2,7,PlayerColor.BLACK);
 		new Runner(5,7,PlayerColor.BLACK);
-		kings.put(PlayerColor.BLACK, new King(4,7,PlayerColor.BLACK));
+		new King(4,7,PlayerColor.BLACK);
 		new Queen(3,7,PlayerColor.BLACK);
 
 		for(int x = 0; x < 8; x++) {
