@@ -7,12 +7,15 @@ import shared.PlayerColor;
 
 public class Queen extends Piece {
 
-	public Queen(Coordinate coord, PlayerColor color) {
-		super(coord, color);
-		setDirections();
-	}
+	/**
+	 * Constructor
+	 * @param x
+	 * @param y
+	 * @param color
+	 */
 	public Queen(int x, int y, PlayerColor color){
-		this(new Coordinate(x,y), color);
+		super(new Coordinate(x,y), color);
+		setDirections();
 	}
 
 
@@ -20,6 +23,10 @@ public class Queen extends Piece {
 	public String toString() {
 		return "queen";
 	}
+	
+	/**
+	 * Sets possible moving directions
+	 */
 	private void setDirections(){
 		directions = new Direction[]{Direction.N, Direction.NE, Direction.E, Direction.SE, Direction.S, Direction.SV, Direction.V, Direction.NV};
 		moveMax = 8;

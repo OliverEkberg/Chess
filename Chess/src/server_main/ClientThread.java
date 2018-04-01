@@ -14,9 +14,13 @@ public class ClientThread extends Thread{
 	private Server server;
 	private boolean isRunning = true;
 
-
-
-
+	/**
+	 * Constructor
+	 * @param server
+	 * @param socket
+	 * @param client
+	 * @throws IOException
+	 */
 	public ClientThread(Server server, Socket socket, Client client) throws IOException {
 		this.server = server;
 		this.client = client;
@@ -24,6 +28,9 @@ public class ClientThread extends Thread{
 		output = new PrintWriter(socket.getOutputStream(), true);
 	} 
 
+	/**
+	 * Kill the thread
+	 */
 	public void kill() {
 		isRunning = false;
 	}

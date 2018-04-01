@@ -36,7 +36,6 @@ import shared.Markers;
 public class View extends JFrame implements MouseListener{  
 
 	private static final long serialVersionUID = 1L;
-
 	private Controller theController;
 
 
@@ -44,12 +43,13 @@ public class View extends JFrame implements MouseListener{
 	 * Canvas related
 	 */
 	private Canvas gameCanvas;  
-	private BufferStrategy backBuffer;
 	private int canvasWidth = 800;
 	private int canvasHeight = 800;
-	
+	private BufferStrategy backBuffer;
+
 	private HashMap<String, Image> images = new HashMap<>(); //Holds all images
 	private boolean firstRender = true;
+
 	private JPanel connectPanel;
 
 	/**
@@ -62,7 +62,7 @@ public class View extends JFrame implements MouseListener{
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE); 
 		createStartupMenu();
 	}  
-
+	
 	/**
 	 * Creates startup menu
 	 */
@@ -110,9 +110,9 @@ public class View extends JFrame implements MouseListener{
 		this.setVisible(true);
 
 	}
-	
+
 	/**
-	 * Add component to a panel
+	 * Adds a component to a panel
 	 * @param thePanel
 	 * @param comp
 	 * @param xPos
@@ -162,12 +162,13 @@ public class View extends JFrame implements MouseListener{
 		this.setSize(canvasWidth, canvasHeight);
 		gameCanvas = new Canvas();  
 		gameCanvas.setSize(canvasWidth, canvasHeight);  
-		gameCanvas.setFocusable(true);  
+	
+		gameCanvas.setFocusable(true);
+
 		this.repaint();
 		this.remove(connectPanel);
 		this.add(gameCanvas);  
 		this.pack();   
-
 
 		gameCanvas.createBufferStrategy(2); 
 		backBuffer = gameCanvas.getBufferStrategy();
@@ -180,7 +181,7 @@ public class View extends JFrame implements MouseListener{
 	 */
 	public void render(ArrayList<DrawPiece> pieces){  
 
-
+		
 		Graphics2D g = (Graphics2D)backBuffer.getDrawGraphics();
 
 		drawTiles(g);
@@ -190,6 +191,7 @@ public class View extends JFrame implements MouseListener{
 		g.dispose();
 		backBuffer.show();
 
+		//Will render twice the first time, image bug
 		if(firstRender) {
 			firstRender = false;
 			try {
@@ -198,7 +200,7 @@ public class View extends JFrame implements MouseListener{
 			render(pieces);
 		}
 	}  
-	
+
 	/**
 	 * Renders the tiles, pieces and markers
 	 * @param pieces
@@ -260,7 +262,6 @@ public class View extends JFrame implements MouseListener{
 		images.put("WHITE_runner", ResourceLoader.getImage("WHITE_runner.png"));
 		images.put("WHITE_tower", ResourceLoader.getImage("WHITE_tower.png"));
 	}
-
 
 
 	/**

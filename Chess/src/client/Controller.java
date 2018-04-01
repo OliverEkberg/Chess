@@ -20,7 +20,7 @@ public class Controller extends Thread{
 
 
 
-	Gson gson = new GsonBuilder().serializeNulls().create();
+	private Gson gson = new GsonBuilder().serializeNulls().create();
 
 	private View theView;
 
@@ -32,11 +32,11 @@ public class Controller extends Thread{
 	private ArrayList<DrawPiece> positions;
 
 
-	public Controller(View theView, String serverAdress, int port){
+	public Controller(View theView, String ipAdress, int port){
 		this.theView = theView;
 
 		try {
-			socket = new Socket(serverAdress, port);
+			socket = new Socket(ipAdress, port);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 		} catch (IOException  | IllegalArgumentException e) {
@@ -55,7 +55,6 @@ public class Controller extends Thread{
 	 * @param clickedCoordinate
 	 */
 	public void clickHandler(Coordinate clickedCoordinate) {
-		theView.render(positions); //For testing purposes
 		out.println(gson.toJson(clickedCoordinate));
 	}
 
@@ -67,8 +66,8 @@ public class Controller extends Thread{
 
 				if(msgFromServer != null && msgFromServer.length() > 10) {
 
-					Commands command = Commands.valueOf(msgFromServer.split("_")[0]);
-					String json = msgFromServer.split("_")[1];
+					Commands command = Commands.valueOf(msgFromServer.split("_")[0]); //Converts everything before "_" to a command.
+					String json = msgFromServer.split("_")[1]; //The data
 
 
 					switch (command) {
@@ -76,7 +75,7 @@ public class Controller extends Thread{
 						positions = gson.fromJson(json, Positions.class).getPositionList();
 						theView.render(positions);
 						break;
-
+					
 					case Markers:
 						Markers markers = gson.fromJson(json, Markers.class);
 						theView.render(positions, markers);
@@ -88,6 +87,13 @@ public class Controller extends Thread{
 						in.close();
 						socket.close();
 						System.exit(0);
+					case Error:
+						theView.displayError(json);
+						out.close();
+						in.close();
+						socket.close();
+						System.exit(0);
+			
 
 					}
 

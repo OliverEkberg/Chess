@@ -6,18 +6,25 @@ import shared.PlayerColor;
 
 public class Runner extends Piece {
 
-	public Runner(Coordinate coord, PlayerColor color) {
-		super(coord, color);
-		setDirections();
-	}
+	/**
+	 * Constructor
+	 * @param x
+	 * @param y
+	 * @param color
+	 */
 	public Runner(int x, int y, PlayerColor color){
-		this(new Coordinate(x,y), color);
+		super(new Coordinate(x,y), color);
+		setDirections();
 	}
 
 	@Override
 	public String toString() {
 		return "runner";
 	}
+	
+	/**
+	 * Sets possible moves
+	 */
 	private void setDirections(){
 		directions = new Direction[]{Direction.NE, Direction.SE, Direction.SV, Direction.NV};
 		moveMax = 8;

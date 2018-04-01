@@ -1,8 +1,10 @@
 package server_main;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,42 +20,66 @@ import shared.Positions;
 
 
 public class Server {
-	private int port = 9001;
 	private ServerSocket serverSocket = null;
 
 	private HashMap<PlayerColor, Socket> sockets = new HashMap<>();
 	private HashMap<PlayerColor, Client> clients = new HashMap<>();
+	
+	private ServerView sv;
 
-	private PlayerColor playerTurn = PlayerColor.WHITE;
 
 	private Gson gson = new GsonBuilder().serializeNulls().create();
 
 	private ChessLogic logic;
 
-
-	public Server() throws IOException, InterruptedException {
-		System.out.println("Up and running ...");		
+	public Server() {
+		sv = new ServerView(this);
+	}
+	
+	public void start(int port) throws IOException {
 		serverSocket = new ServerSocket(port);
 		logic = new ChessLogic();
+		waitForPlayers();
+		logic.setGameRunning(true);
+	}
+	public void stop() {
+		logic.setGameRunning(false);
+		for (PlayerColor c : clients.keySet()) {
+			clients.get(c).send("Error_Server not responding.");
+		}
+		System.exit(0);
+	}
 
-		/*
-		 * First player is black
-		 */
-		PlayerColor color = PlayerColor.BLACK;
+	private void waitForPlayers() throws IOException {
+		new Thread()
+		{
+			public void run() {
 
-		sockets.put(color, serverSocket.accept());
-		clients.put(color, new Client(color, sockets.get(color), this));
-		sendPositions(clients.get(color));
+				try {
+					/*
+					 * First player is black
+					 */
+					PlayerColor color = PlayerColor.BLACK;
+					sockets.put(color, serverSocket.accept());
+					clients.put(color, new Client(color, sockets.get(color), Server.this));
+					sendPositions(clients.get(color));
 
 
-		/*
-		 * Second player is white
-		 */
-		color = PlayerColor.WHITE;
+					/*
+					 * Second player is white
+					 */
+					color = PlayerColor.WHITE;
 
-		sockets.put(color, serverSocket.accept());
-		clients.put(color, new Client(color, sockets.get(color), this));
-		sendPositions(clients.get(color));
+					sockets.put(color, serverSocket.accept());
+					clients.put(color, new Client(color, sockets.get(color), Server.this));
+					sendPositions(clients.get(color));
+				} catch (IOException e) {
+					sv.showError("Could not connect both players.");
+				}
+
+			}
+		}.start();
+
 	}
 
 	/**
@@ -70,7 +96,7 @@ public class Server {
 		/*
 		 * Player needs to have turn
 		 */
-		if(playerTurn.equals(client.getColor())) {
+		if(logic.getPlayerTurn().equals(client.getColor())) {
 
 			//Parsing JSON
 			Coordinate clickedCoordinate = gson.fromJson(json, Coordinate.class);
@@ -115,18 +141,18 @@ public class Server {
 				 */
 				if(logic.isMovable(clickedCoordinate,selectedPiece) && !logic.isChess(clickedCoordinate,selectedPiece)){
 					logic.move(selectedPiece,clickedCoordinate);
-					switchTurn(client.getColor());
+					logic.switchTurn(client.getColor());
 					client.setSelectedCoord(clickedCoordinate);
 					sendPositions(clients);
 
-					if(!logic.canMakeMove(playerTurn)) {
-						if(logic.isChess(playerTurn)) {
+					if(!logic.canMakeMove(logic.getPlayerTurn())) {
+						if(logic.isChess(logic.getPlayerTurn())) {
 							for(PlayerColor key : clients.keySet()) {
-								clients.get(key).send(Commands.GameOver +"_"+"Chess mate. " + playerTurn + " player lost!");
+								clients.get(key).send(Commands.GameOver +"_"+"Chess mate. " + logic.getPlayerTurn() + " player lost!");
 							}
 						}else {
 							for(PlayerColor key : clients.keySet()) {
-								clients.get(key).send(Commands.GameOver +"_"+"Patt. " + playerTurn + " player lost!");
+								clients.get(key).send(Commands.GameOver +"_"+"Patt. " + logic.getPlayerTurn() + " player lost!");
 							}
 						}
 						stop();
@@ -142,7 +168,6 @@ public class Server {
 
 
 	}
-
 
 
 	/**
@@ -174,25 +199,17 @@ public class Server {
 	}
 
 
-	/**
-	 * Switches playerTurn
-	 * @param playerColor
-	 */
-	private void switchTurn(PlayerColor playerColor) {
-		playerTurn = (playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
+	public String getIp() {
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-
-	private void start() {
-		logic.setGameRunning(true);
-	}
-	private void stop() {
-		logic.setGameRunning(false);
-		System.exit(0);
-	}
 	public static void main(String[] args) throws IOException, InterruptedException {
-		Server s = new Server();
-		s.start();
+		new Server();
 	}
 
 }

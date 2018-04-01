@@ -23,7 +23,9 @@ public abstract class Piece {
 		this.color = color;
 	}
 	
-
+	/*
+	 * Setters and getters
+	 */
 	public boolean isActive() {
 		return active;
 	}
@@ -68,13 +70,10 @@ public abstract class Piece {
 
 
 	
-	public abstract String toString();
-
-
 	public boolean isKing() {
 		return false;
 	}
-
-
+	
+	public abstract String toString();
 
 }

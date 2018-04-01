@@ -5,12 +5,21 @@ public class DrawPiece{
 	private PlayerColor playerColor;
 	private String type;
 
+	/**
+	 * Constructor
+	 * @param coord
+	 * @param playerColor
+	 * @param type
+	 */
 	public DrawPiece(Coordinate coord, PlayerColor playerColor, String type) {
 		this.coord = coord;
 		this.playerColor = playerColor;
 		this.type = type;
 	}
 
+	/*
+	 * Setters and getters
+	 */
 	public Coordinate getCoord() {
 		return coord;
 	}
@@ -34,7 +43,5 @@ public class DrawPiece{
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	
 	
 }

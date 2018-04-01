@@ -6,11 +6,14 @@ import shared.PlayerColor;
 
 public class Horse extends Piece {
 
-	public Horse(Coordinate coord, PlayerColor color) {
-		super(coord, color);
-	}
+	/**
+	 * Constructor
+	 * @param x
+	 * @param y
+	 * @param color
+	 */
 	public Horse(int x, int y, PlayerColor color){
-		this(new Coordinate(x,y), color);
+		super(new Coordinate(x,y), color);
 	}
 
 

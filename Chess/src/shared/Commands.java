@@ -2,5 +2,7 @@ package shared;
 
 public enum Commands {
 	Positions,
-	Markers, GameOver
+	Markers, 
+	GameOver,
+	Error
 }

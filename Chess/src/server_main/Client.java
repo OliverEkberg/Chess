@@ -16,11 +16,19 @@ public class Client {
 		this.thread = new ClientThread(server, socket, this);
 		thread.start();
 	}
+	
+	public void send(String str) {
+		thread.writeToClient(str);
+	}
+	
 
+	/*
+	 * Setters and getters
+	 */
 	public Coordinate getSelectedCoord() {
 		return selectedCoord;
 	}
-
+	
 	public void setSelectedCoord(Coordinate selectedCoord) {
 		this.selectedCoord = selectedCoord;
 	}
@@ -29,9 +37,4 @@ public class Client {
 		return color;
 	}
 	
-	public void send(String str) {
-		thread.writeToClient(str);
-	}
-
-
 }

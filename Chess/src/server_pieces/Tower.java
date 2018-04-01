@@ -8,19 +8,24 @@ import shared.PlayerColor;
 
 public class Tower extends Piece {
 
-	public Tower(Coordinate coord, PlayerColor color) {
-		super(coord, color);
+	/**
+	 * Constructor
+	 * @param x
+	 * @param y
+	 * @param color
+	 */
+	public Tower(int x, int y, PlayerColor color){
+		super(new Coordinate(x,y), color);
 		setDirections();
 	}
-	public Tower(int x, int y, PlayerColor color){
-		this(new Coordinate(x,y), color);
-	}
-
 	
 	public String toString(){
 		return "tower";
 	}
 
+	/**
+	 * Sets possible moving directions
+	 */
 	private void setDirections(){
 		directions = new Direction[]{Direction.N, Direction.E, Direction.S, Direction.V};
 		moveMax = 8;

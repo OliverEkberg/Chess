@@ -3,10 +3,18 @@ package shared;
 import java.util.ArrayList;
 
 public class Markers {
+	
+	//Contains all free moves
 	private ArrayList<Coordinate> freeMoves = new ArrayList<>();
+	//Contains all enemy moves
 	private ArrayList<Coordinate> enemyMoves = new ArrayList<>();
+	
 	private Coordinate selected;
 	
+	
+	/*
+	 * Setters and getters
+	 */
 	public Coordinate getSelected() {
 		return selected;
 	}

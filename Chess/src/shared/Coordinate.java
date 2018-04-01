@@ -5,6 +5,11 @@ public class Coordinate {
 	public int x;
 	public int y;
 	
+	/**
+	 * Constructor
+	 * @param x
+	 * @param y
+	 */
 	public Coordinate(int x, int y){
 		this.x = x;
 		this.y = y;
@@ -16,8 +21,12 @@ public class Coordinate {
 	 * @return
 	 */
 	public boolean equals(Coordinate coord){
+		if(coord == null) {
+			return false;
+		}
 		return this.x == coord.x && this.y == coord.y;
 	}
+	
 	
 	public String toString() {
 		return "["+x+","+y+"]";

@@ -6,15 +6,16 @@ import shared.PlayerColor;
 
 public class Pawn extends Piece {
 
-	/*
-	 * Constructors
+	
+	/**
+	 * Constructor
+	 * @param x
+	 * @param y
+	 * @param color
 	 */
-	public Pawn(Coordinate coord, PlayerColor color) {
-		super(coord, color);
-		setDirections();
-	}
 	public Pawn(int x, int y, PlayerColor color){
-		this(new Coordinate(x,y), color);
+		super(new Coordinate(x,y), color);
+		setDirections();
 	}
 
 
@@ -22,14 +23,17 @@ public class Pawn extends Piece {
 	@Override
 	public void setCoordinate(Coordinate coord){
 		this.coord = coord;
-		moveMax = 1;
-		
+		moveMax = 1; //Pawn can only move one step after first move
 	}
 
 	@Override
 	public String toString() {
 		return "pawn";
 	}
+	
+	/**
+	 * Sets the possible move directions
+	 */
 	private void setDirections(){
 		if(this.color.equals(PlayerColor.WHITE))
 			directions = new Direction[]{Direction.S};

@@ -16,21 +16,61 @@ public class ChessLogic {
 
 	private ArrayList<Piece> pieces = new ArrayList<>();
 	private boolean gameRunning = false;
-	
-	
-	
+	private PlayerColor playerTurn = PlayerColor.WHITE;
 
+	/**
+	 * Constructor
+	 */
+	public ChessLogic() {
+		createPieces();
+	}
 
-	
+	/**
+	 * Creates all the pieces
+	 */
+	private void createPieces(){
+
+		//White player
+		pieces.add(new Tower(0,0,PlayerColor.WHITE));
+		pieces.add(new Tower(7,0,PlayerColor.WHITE));
+		pieces.add(new Horse(1,0,PlayerColor.WHITE));
+		pieces.add(new Horse(6,0,PlayerColor.WHITE));
+		pieces.add(new Runner(2,0,PlayerColor.WHITE));
+		pieces.add(new Runner(5,0,PlayerColor.WHITE));
+		pieces.add(new King(4,0,PlayerColor.WHITE));
+		pieces.add(new Queen(3,0,PlayerColor.WHITE));
+
+		for(int x = 0; x < 8; x++) {
+			pieces.add(new Pawn(x,1,PlayerColor.WHITE));
+		}
+
+		//Black player
+		pieces.add(new Tower(0,7,PlayerColor.BLACK));
+		pieces.add(new Tower(7,7,PlayerColor.BLACK));
+		pieces.add(new Horse(1,7,PlayerColor.BLACK));
+		pieces.add(new Horse(6,7,PlayerColor.BLACK));
+		pieces.add(new Runner(2,7,PlayerColor.BLACK));
+		pieces.add(new Runner(5,7,PlayerColor.BLACK));
+		pieces.add(new King(4,7,PlayerColor.BLACK));
+		pieces.add(new Queen(3,7,PlayerColor.BLACK));
+
+		for(int x = 0; x < 8; x++) {
+			pieces.add(new Pawn(x,6,PlayerColor.BLACK));
+		}
+
+	}
+
 	public boolean isGameRunning() {
 		return gameRunning;
 	}
 	public void setGameRunning(boolean gameRunning) {
 		this.gameRunning = gameRunning;
 	}
-	public ChessLogic() {
-		createPieces();
+	public ArrayList<Piece> getPieces() {
+		return pieces;
 	}
+
+
 	/**
 	 * Finds the requested piece and returns it
 	 * @param coord
@@ -83,6 +123,11 @@ public class ChessLogic {
 		return true;	
 	}
 
+	/**
+	 * Makes a move
+	 * @param p
+	 * @param c
+	 */
 	public void move(Piece p, Coordinate c) {
 		removePiece(c);
 		p.setCoordinate(c);
@@ -116,7 +161,7 @@ public class ChessLogic {
 	}
 
 	/**
-	 * Checks if a given move will put the king in chess
+	 * Checks if a given move will put the player in chess
 	 * @param to
 	 * @return
 	 */
@@ -163,45 +208,9 @@ public class ChessLogic {
 			}
 		}
 		return false;
-
 	}
 
 
-
-	/**
-	 * Creates all the pieces
-	 */
-	public void createPieces(){
-
-		//White player
-		pieces.add(new Tower(0,0,PlayerColor.WHITE));
-		pieces.add(new Tower(7,0,PlayerColor.WHITE));
-		pieces.add(new Horse(1,0,PlayerColor.WHITE));
-		pieces.add(new Horse(6,0,PlayerColor.WHITE));
-		pieces.add(new Runner(2,0,PlayerColor.WHITE));
-		pieces.add(new Runner(5,0,PlayerColor.WHITE));
-		pieces.add(new King(4,0,PlayerColor.WHITE));
-		pieces.add(new Queen(3,0,PlayerColor.WHITE));
-
-		for(int x = 0; x < 8; x++) {
-			pieces.add(new Pawn(x,1,PlayerColor.WHITE));
-		}
-
-		//Black player
-		pieces.add(new Tower(0,7,PlayerColor.BLACK));
-		pieces.add(new Tower(7,7,PlayerColor.BLACK));
-		pieces.add(new Horse(1,7,PlayerColor.BLACK));
-		pieces.add(new Horse(6,7,PlayerColor.BLACK));
-		pieces.add(new Runner(2,7,PlayerColor.BLACK));
-		pieces.add(new Runner(5,7,PlayerColor.BLACK));
-		pieces.add(new King(4,7,PlayerColor.BLACK));
-		pieces.add(new Queen(3,7,PlayerColor.BLACK));
-
-		for(int x = 0; x < 8; x++) {
-			pieces.add(new Pawn(x,6,PlayerColor.BLACK));
-		}
-
-	}
 	/**
 	 * Returns all the possible moves
 	 * @return
@@ -209,11 +218,13 @@ public class ChessLogic {
 	public ArrayList<Coordinate> isMovableAll(Piece p){
 		ArrayList<Coordinate> list = new ArrayList<>();
 
+		//Inactive piece can not move
 		if(!p.isActive()) {
 			return list;
 		}
 
 
+		//Pawn specific rules
 		if(p instanceof Pawn) {
 
 			if(p.getColor().equals(PlayerColor.WHITE)){
@@ -239,14 +250,15 @@ public class ChessLogic {
 			for(int i = 0; i < p.getMoveMax(); i++){
 				if(isEmpty(p.getCoordinate().getMove(p.getDirections()[0], i+1))){
 					list.add(p.getCoordinate().getMove(p.getDirections()[0], i+1));
-
 				}else{
 					break;
 				}
 			}	
 
 
-			return list;
+
+
+
 		}else if(p instanceof Horse) {
 
 			for(int y = 0; y < 8; y ++){
@@ -259,7 +271,7 @@ public class ChessLogic {
 				}
 			}
 
-			return list;
+
 		}else {
 
 			for(Direction d : p.getDirections()){
@@ -282,10 +294,10 @@ public class ChessLogic {
 				}	
 
 			}
-			return list;
-		}
-	}
 
+		}
+		return list;
+	}
 
 	/**
 	 * Checks if piece can move to coordinate
@@ -299,14 +311,16 @@ public class ChessLogic {
 				return true;
 		return false;
 	}
-	public ArrayList<Piece> getPieces() {
-		return pieces;
+	
+	/**
+	 * Switches playerTurn
+	 * @param playerColor
+	 */
+	public void switchTurn(PlayerColor playerColor) {
+		playerTurn = (playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
 	}
-
-
-
-
-
-
+	public PlayerColor getPlayerTurn() {
+		return playerTurn;
+	}
 
 }
