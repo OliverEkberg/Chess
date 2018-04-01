@@ -1,4 +1,4 @@
-package game;
+package shared;
 
 public enum Direction {
 	N,

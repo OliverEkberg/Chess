@@ -1,4 +1,4 @@
-package json;
+package shared;
 
 import java.util.ArrayList;
 

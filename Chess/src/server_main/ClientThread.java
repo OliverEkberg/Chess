@@ -1,4 +1,4 @@
-package game;
+package server_main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,8 @@ public class ClientThread extends Thread{
 	private PrintWriter output;
 	private Client client;
 	private Server server;
+	private boolean isRunning = true;
+
 
 
 
@@ -22,12 +24,16 @@ public class ClientThread extends Thread{
 		output = new PrintWriter(socket.getOutputStream(), true);
 	} 
 
+	public void kill() {
+		isRunning = false;
+	}
+
 	/**
 	 * Input
 	 */
 	public void run(){
 
-		while(true){
+		while(isRunning){
 			try {
 				String json = input.readLine();
 				server.fromClient(json, client);

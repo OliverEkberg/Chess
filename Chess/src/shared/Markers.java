@@ -1,8 +1,6 @@
-package json;
+package shared;
 
 import java.util.ArrayList;
-
-import game.Coordinate;
 
 public class Markers {
 	private ArrayList<Coordinate> freeMoves = new ArrayList<>();

@@ -1,7 +1,10 @@
-package game;
+package server_main;
 
 import java.io.IOException;
 import java.net.Socket;
+
+import shared.Coordinate;
+import shared.PlayerColor;
 
 public class Client {
 	private Coordinate selectedCoord = null;

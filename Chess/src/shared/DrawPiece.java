@@ -1,7 +1,4 @@
-package json;
-
-import game.Coordinate;
-import game.PlayerColor;
+package shared;
 
 public class DrawPiece{
 	private Coordinate coord;

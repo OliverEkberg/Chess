@@ -1,20 +1,20 @@
-package game;
+package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import json.Commands;
-import json.DrawPiece;
-import json.Markers;
-import json.Positions;
+import shared.Commands;
+import shared.Coordinate;
+import shared.DrawPiece;
+import shared.Markers;
+import shared.Positions;
 
 public class Controller extends Thread{
 
@@ -29,16 +29,21 @@ public class Controller extends Thread{
 	private PrintWriter out; 
 
 
-	public ArrayList<DrawPiece> positions;
+	private ArrayList<DrawPiece> positions;
 
 
-	public Controller(View theView, String serverAdress, int port) throws UnknownHostException, IOException{
+	public Controller(View theView, String serverAdress, int port){
 		this.theView = theView;
 
-		socket = new Socket(serverAdress, port);
+		try {
+			socket = new Socket(serverAdress, port);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			out = new PrintWriter(socket.getOutputStream(), true);
+		} catch (IOException  | IllegalArgumentException e) {
+			theView.displayError("Could not connect to server.");
+			System.exit(0);
+		}
 
-		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		out = new PrintWriter(socket.getOutputStream(), true);
 
 
 
@@ -59,7 +64,7 @@ public class Controller extends Thread{
 			while(true){
 
 				String msgFromServer = in.readLine();
-				
+
 				if(msgFromServer != null && msgFromServer.length() > 10) {
 
 					Commands command = Commands.valueOf(msgFromServer.split("_")[0]);
@@ -68,19 +73,24 @@ public class Controller extends Thread{
 
 					switch (command) {
 					case Positions:  
-						
 						positions = gson.fromJson(json, Positions.class).getPositionList();
 						theView.render(positions);
-						
 						break;
-					
+
 					case Markers:
 						Markers markers = gson.fromJson(json, Markers.class);
 						theView.render(positions, markers);
-					
+						break;
+
+					case GameOver:
+						theView.gameOver(json);
+						out.close();
+						in.close();
+						socket.close();
+						System.exit(0);
+
 					}
 
-				
 
 				}
 
@@ -96,6 +106,8 @@ public class Controller extends Thread{
 				in.close();
 				socket.close();
 			} catch (IOException e2) {}
+			theView.displayError("Crashed.");
+			System.exit(0);
 		}
 	}
 

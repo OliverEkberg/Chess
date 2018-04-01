@@ -1,8 +1,8 @@
-package pieces;
-import game.Coordinate;
-import game.Direction;
-import game.Piece;
-import game.PlayerColor;
+package server_pieces;
+import server_main.Piece;
+import shared.Coordinate;
+import shared.Direction;
+import shared.PlayerColor;
 
 public class Runner extends Piece {
 

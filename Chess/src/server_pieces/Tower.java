@@ -1,10 +1,10 @@
-package pieces;
+package server_pieces;
 
 
-import game.Coordinate;
-import game.Direction;
-import game.Piece;
-import game.PlayerColor;
+import server_main.Piece;
+import shared.Coordinate;
+import shared.Direction;
+import shared.PlayerColor;
 
 public class Tower extends Piece {
 

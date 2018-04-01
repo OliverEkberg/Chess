@@ -1,4 +1,4 @@
-package game;
+package server_main;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -9,10 +9,12 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import json.Commands;
-import json.DrawPiece;
-import json.Markers;
-import json.Positions;
+import shared.Commands;
+import shared.Coordinate;
+import shared.DrawPiece;
+import shared.Markers;
+import shared.PlayerColor;
+import shared.Positions;
 
 
 public class Server {
@@ -26,10 +28,13 @@ public class Server {
 
 	private Gson gson = new GsonBuilder().serializeNulls().create();
 
-	public Server() throws IOException {
+	private ChessLogic logic;
+
+
+	public Server() throws IOException, InterruptedException {
 		System.out.println("Up and running ...");		
-		Piece.createPieces();
 		serverSocket = new ServerSocket(port);
+		logic = new ChessLogic();
 
 		/*
 		 * First player is black
@@ -39,7 +44,6 @@ public class Server {
 		sockets.put(color, serverSocket.accept());
 		clients.put(color, new Client(color, sockets.get(color), this));
 		sendPositions(clients.get(color));
-
 
 
 		/*
@@ -59,6 +63,9 @@ public class Server {
 	 */
 	public synchronized void fromClient(String json, Client client) {
 
+		if(!logic.isGameRunning()) {
+			return;
+		}
 
 		/*
 		 * Player needs to have turn
@@ -68,24 +75,24 @@ public class Server {
 			//Parsing JSON
 			Coordinate clickedCoordinate = gson.fromJson(json, Coordinate.class);
 
-		
+
 			/*
 			 * If player owns clicked piece, it's possible moves will be collected
 			 */
-			if(Piece.isOwnedBy(clickedCoordinate, client.getColor())) {
-				
+			if(logic.isOwnedBy(clickedCoordinate, client.getColor())) {
+
 				client.setSelectedCoord(clickedCoordinate);
-				
+
 				Markers markers = new Markers();
 				markers.setSelected(client.getSelectedCoord());
 
 
-				ArrayList<Coordinate> allMoves = Piece.getPiece(client.getSelectedCoord()).isMovableAll();
+				ArrayList<Coordinate> allMoves = logic.isMovableAll(logic.getPiece(client.getSelectedCoord()));
 
 				for(Coordinate c : allMoves){
-					if(Piece.isEmpty(c)){
+					if(logic.isEmpty(c)){
 						markers.getFreeMoves().add(c);
-					}else if(Piece.getPiece(c).isEnemy(client.getColor())){
+					}else if(logic.getPiece(c).isEnemy(client.getColor())){
 						markers.getEnemyMoves().add(c);
 					}
 				}
@@ -95,38 +102,43 @@ public class Server {
 				client.send(returnJson);
 				return;
 			}
-			
-			
+
+
 			/*
 			 * The selected piece needs to be owned by the player
 			 */
-			if (Piece.isOwnedBy(client.getSelectedCoord(), client.getColor())) {
-				Piece selectedPiece = Piece.getPiece(client.getSelectedCoord());
-				
+			if (logic.isOwnedBy(client.getSelectedCoord(), client.getColor())) {
+				Piece selectedPiece = logic.getPiece(client.getSelectedCoord());
+
 				/*
 				 * Moves selected piece if possible
 				 */
-				if(selectedPiece.isMovable(clickedCoordinate) && !selectedPiece.isChess(clickedCoordinate)){
-					selectedPiece.move(clickedCoordinate);
+				if(logic.isMovable(clickedCoordinate,selectedPiece) && !logic.isChess(clickedCoordinate,selectedPiece)){
+					logic.move(selectedPiece,clickedCoordinate);
 					switchTurn(client.getColor());
 					client.setSelectedCoord(clickedCoordinate);
 					sendPositions(clients);
-					
-					if(!Piece.canMakeMove(playerTurn)) {
-						if(Piece.isChess(playerTurn)) {
-							System.out.println("CHESS MATE");
+
+					if(!logic.canMakeMove(playerTurn)) {
+						if(logic.isChess(playerTurn)) {
+							for(PlayerColor key : clients.keySet()) {
+								clients.get(key).send(Commands.GameOver +"_"+"Chess mate. " + playerTurn + " player lost!");
+							}
 						}else {
-							System.out.println("PATT");
+							for(PlayerColor key : clients.keySet()) {
+								clients.get(key).send(Commands.GameOver +"_"+"Patt. " + playerTurn + " player lost!");
+							}
 						}
-						
+						stop();
+
 					}
-					
+
 				}
 			}
-			
+
 
 		}
-	
+
 
 
 	}
@@ -140,8 +152,8 @@ public class Server {
 	private void sendPositions(Client client) {
 		Positions p = new Positions();
 
-		for (Piece piece : Piece.pieces) {
-			p.addPosition(new DrawPiece(piece.coord, piece.color, piece.toString()));
+		for (Piece piece : logic.getPieces()) {
+			p.addPosition(new DrawPiece(piece.getCoordinate(), piece.getColor(), piece.toString()));
 		}
 
 		String returnJson = Commands.Positions.toString()+"_";
@@ -161,7 +173,7 @@ public class Server {
 		}
 	}
 
-	
+
 	/**
 	 * Switches playerTurn
 	 * @param playerColor
@@ -170,8 +182,17 @@ public class Server {
 		playerTurn = (playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
 	}
 
-	public static void main(String[] args) throws IOException {
+
+	private void start() {
+		logic.setGameRunning(true);
+	}
+	private void stop() {
+		logic.setGameRunning(false);
+		System.exit(0);
+	}
+	public static void main(String[] args) throws IOException, InterruptedException {
 		Server s = new Server();
+		s.start();
 	}
 
 }

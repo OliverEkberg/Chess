@@ -1,6 +1,6 @@
-package json;
+package shared;
 
 public enum Commands {
 	Positions,
-	Markers
+	Markers, GameOver
 }
