@@ -46,7 +46,7 @@ public class Controller extends Thread{
 	 * @param theView 	Reference to view
 	 * @param ipAdress 	Address of server
 	 * @param port 		Port of server
-	 * @see View#displayError(String)
+	 * @see 				View#displayError(String)
 	 */
 	public Controller(View theView, String ipAdress, int port){
 		this.theView = theView;

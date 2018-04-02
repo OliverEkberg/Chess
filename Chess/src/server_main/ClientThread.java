@@ -6,6 +6,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Thread that handles all the IO for a client
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class ClientThread extends Thread{
 
 	private BufferedReader input;
@@ -14,9 +21,11 @@ public class ClientThread extends Thread{
 	private Server server;
 	private boolean isRunning = true;
 
+	
 	/**
-	 * Constructor
-	 * @param server
+	 * Sets variables and creates a input and output
+	 * 
+	 * @param server		Reference to the server
 	 * @param socket
 	 * @param client
 	 * @throws IOException
@@ -28,15 +37,19 @@ public class ClientThread extends Thread{
 		output = new PrintWriter(socket.getOutputStream(), true);
 	} 
 
+	
 	/**
-	 * Kill the thread
+	 * Kills the thread
 	 */
 	public void kill() {
 		isRunning = false;
 	}
 
+	
 	/**
-	 * Input
+	 * While game {@link #isRunning is running} it takes in json from client, formats it and sends it to the {@link Server server}
+	 * 
+	 * @see Server#fromClient(String, Client)
 	 */
 	public void run(){
 
@@ -49,8 +62,9 @@ public class ClientThread extends Thread{
 		}
 	}
 
+	
 	/**
-	 * Output
+	 * @param msg	Message to send to the client
 	 */
 	public void writeToClient(String msg){
 		if(msg != null) 

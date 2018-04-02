@@ -15,10 +15,10 @@ public class Markers {
 	/*
 	 * Setters and getters
 	 */
-	public Coordinate getSelected() {
+	public Coordinate getSelectedCoordinate() {
 		return selected;
 	}
-	public void setSelected(Coordinate selected) {
+	public void setSelectedCoordinate(Coordinate selected) {
 		this.selected = selected;
 	}
 	public ArrayList<Coordinate> getFreeMoves() {

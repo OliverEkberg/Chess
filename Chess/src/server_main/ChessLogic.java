@@ -1,7 +1,18 @@
 package server_main;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import javafx.util.Pair;
 import server_pieces.Horse;
 import server_pieces.King;
 import server_pieces.Pawn;
@@ -12,14 +23,24 @@ import shared.Coordinate;
 import shared.Direction;
 import shared.PlayerColor;
 
+/**
+ * Handles all the chess logic.
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class ChessLogic {
 
 	private ArrayList<Piece> pieces = new ArrayList<>();
 	private boolean gameRunning = false;
+	private ArrayList<Pair<Coordinate, Coordinate>> gameHistory = new ArrayList<>();
 	private PlayerColor playerTurn = PlayerColor.WHITE;
 
+	private Gson gson = new GsonBuilder().serializeNulls().create();
+
 	/**
-	 * Constructor
+	 * @see ChessLogic#createPieces()
 	 */
 	public ChessLogic() {
 		createPieces();
@@ -60,21 +81,56 @@ public class ChessLogic {
 
 	}
 
+
+	/**
+	 * Switches playerTurn
+	 * 
+	 * @see shared.PlayerColor
+	 */
+	public void switchTurn() {
+		playerTurn = (playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
+	}
+
+
+	/**
+	 * @return	The player that has turn
+	 */
+	public PlayerColor getPlayerTurn() {
+		return playerTurn;
+	}
+
+
+	/**
+	 * @return If game is running or not
+	 */
 	public boolean isGameRunning() {
 		return gameRunning;
 	}
+
+
+	/**
+	 * @param gameRunning	Boolean of game running
+	 */
 	public void setGameRunning(boolean gameRunning) {
 		this.gameRunning = gameRunning;
 	}
+
+
+	/**
+	 * @return	A list with all the pieces
+	 */
 	public ArrayList<Piece> getPieces() {
 		return pieces;
 	}
 
 
 	/**
-	 * Finds the requested piece and returns it
-	 * @param coord
-	 * @return
+	 * Finds the requested {@link Piece} and returns it
+	 * 
+	 * @param coord 		Matching coordinate.
+	 * @return 			Matching piece or null
+	 * @see 				Piece#getCoordinate()
+	 * @see 				PlayerColor#equals(Coordinate)
 	 */
 	public Piece getPiece(Coordinate coord){
 		for(Piece piece : pieces) {
@@ -85,33 +141,34 @@ public class ChessLogic {
 		return null;
 	}
 
+
 	/**
-	 * Removes piece by coordinate
-	 * @param coord
+	 * @param coord 		Piece at {@link Coordinate} to remove
 	 */
 	public void removePiece(Coordinate coord){
 		pieces.remove(getPiece(coord));
 	}
 
 
-
 	/**
-	 * Checks if piece at c is owned by player
-	 * @param c
-	 * @param playerTurn
-	 * @return
+	 * Checks if a piece at a {@link shared.Coordinate coordinate} is owned by a specific player
+	 * 
+	 * @param c			Coordinate of the piece
+	 * @param player		Color of the player
+	 * @return			If the piece is owned by the player with the {@link shared.PlayerColor color} or not
+	 * @see 				ChessLogic#isEmpty(Coordinate)
 	 */
 	public  boolean isOwnedBy(Coordinate c, PlayerColor player){
-		if(c == null || isEmpty(c)) {
-			return false;
-		}
-		return getPiece(c).getColor().equals(player);
+		return (c == null || isEmpty(c)) ? false : getPiece(c).getColor().equals(player); 
 	}
+
 
 	/**
 	 * Checks if coordinate is empty
-	 * @param coord
-	 * @return
+	 * 
+	 * @param coord		Coordinate to check if empty
+	 * @return			Coordinate empty or not
+	 * @see 				Piece#getCoordinate()
 	 */
 	public  boolean isEmpty(Coordinate coord){
 		for(Piece piece : pieces) {
@@ -119,24 +176,33 @@ public class ChessLogic {
 				return false;
 			}
 		}
-
 		return true;	
 	}
 
+
 	/**
-	 * Makes a move
-	 * @param p
-	 * @param c
+	 * Moves a {@link Piece piece} and saves the move
+	 * 
+	 * @param p		Piece to move
+	 * @param c		Where to move the piece
+	 * @see 			ChessLogic#saveGame()
+	 * @see 			ChessLogic#removePiece(Coordinate)
+	 * @see 			Piece#setCoordinate(Coordinate)
 	 */
 	public void move(Piece p, Coordinate c) {
+		addDraw(p.getCoordinate(), c);
 		removePiece(c);
 		p.setCoordinate(c);
 	}
 
+
 	/**
 	 * Checks if the player is in chess
-	 * @param playerColor
-	 * @return
+	 * 
+	 * @param playerColor	Color of the player to check
+	 * @return 				If the player is in chess or not
+	 * @see 					Piece
+	 * @see					ChessLogic#isMovable(Coordinate, Piece)
 	 */
 	public boolean isChess(PlayerColor playerColor) {
 
@@ -160,10 +226,15 @@ public class ChessLogic {
 		return false;
 	}
 
+
 	/**
 	 * Checks if a given move will put the player in chess
-	 * @param to
-	 * @return
+	 * 
+	 * @param move	Where the piece want to be moved
+	 * @param p		Which piece
+	 * @return		If it will put the player in chess or not
+	 * @see			Coordinate
+	 * @see			ChessLogic#isChess(PlayerColor)
 	 */
 	public boolean isChess(Coordinate move, Piece p) {
 
@@ -188,16 +259,18 @@ public class ChessLogic {
 	}
 
 
-
 	/**
 	 * Checks if the player can make any moves
-	 * @param playerTurn
-	 * @return
+	 * 
+	 * @param player		Which player
+	 * @return			If the player can make any moves at all
+	 * @see 				ChessLogic#isMovable(Coordinate, Piece)
+	 * @see				ChessLogic#isMovable(Coordinate, Piece)
 	 */
-	public  boolean canMakeMove(PlayerColor playerTurn) {
+	public  boolean canMakeMove(PlayerColor player) {
 
 		for (Piece piece : pieces) {
-			if(piece.getColor() == playerTurn) {
+			if(piece.getColor() == player) {
 				ArrayList<Coordinate> possibleMoves = isMovableAll(piece);
 				for (Coordinate coordinate : possibleMoves) {
 					if(isMovable(coordinate, piece) && !isChess(coordinate, piece)) {
@@ -212,8 +285,7 @@ public class ChessLogic {
 
 
 	/**
-	 * Returns all the possible moves
-	 * @return
+	 * @return	All the possible moves for a {@link Piece piece}
 	 */
 	public ArrayList<Coordinate> isMovableAll(Piece p){
 		ArrayList<Coordinate> list = new ArrayList<>();
@@ -258,7 +330,7 @@ public class ChessLogic {
 
 
 
-
+			//Horse specific rules
 		}else if(p instanceof Horse) {
 
 			for(int y = 0; y < 8; y ++){
@@ -271,7 +343,7 @@ public class ChessLogic {
 				}
 			}
 
-
+			//Every other kind of piece
 		}else {
 
 			for(Direction d : p.getDirections()){
@@ -299,10 +371,14 @@ public class ChessLogic {
 		return list;
 	}
 
+	
 	/**
-	 * Checks if piece can move to coordinate
-	 * @param coord
-	 * @return
+	 * Checks if a {@link Piece piece} can move to a specific {@link Coordinate coordinate}
+	 * 
+	 * @param coord		Coordinate to move to
+	 * @param p			Piece to move
+	 * @return			If the piece can move to that coordinate or not
+	 * @see				ChessLogic#isMovableAll(Piece)
 	 */
 	public boolean isMovable(Coordinate coord, Piece p){
 		ArrayList<Coordinate> possibleMoves = isMovableAll(p);
@@ -311,16 +387,61 @@ public class ChessLogic {
 				return true;
 		return false;
 	}
+
 	
 	/**
-	 * Switches playerTurn
-	 * @param playerColor
+	 * Adds a draw to a list
+	 * 
+	 * @param pieceCoordinate	Where the piece was
+	 * @param moveCoordinate		Where the piece moved
+	 * @see						ChessLogic#gameHistory
 	 */
-	public void switchTurn(PlayerColor playerColor) {
-		playerTurn = (playerTurn == PlayerColor.WHITE) ? PlayerColor.BLACK : PlayerColor.WHITE;
+	public void addDraw(Coordinate pieceCoordinate, Coordinate moveCoordinate) {
+		gameHistory.add(new Pair<Coordinate, Coordinate>(pieceCoordinate, moveCoordinate));
 	}
-	public PlayerColor getPlayerTurn() {
-		return playerTurn;
+
+
+	/**
+	 * Converts {@link ChessLogic#gameHistory the game history} to json and saves it in a file
+	 * @see		SavedGames#addGame(ArrayList)
+	 */
+	public void saveGame() {
+		SavedGames games = new SavedGames();
+		File file = new File("games.json");
+
+
+		/*
+		 * Gets previous games if file exists, otherwise uses new list
+		 */
+		if(file.exists()) {
+			byte[] encoded = null;
+			try {
+				encoded = Files.readAllBytes(Paths.get("games.json"));
+			} catch (IOException e) {}
+			games = gson.fromJson(new String(encoded), SavedGames.class);
+		}
+
+		games.addGame(gameHistory);
+
+
+		if (file.exists()){
+			file.delete();
+		}  
+
+		/*
+		 * Writes the file
+		 */
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(file,true);
+		} catch (IOException e) {}
+		BufferedWriter bw = new BufferedWriter(fw);
+		PrintWriter pw = new PrintWriter(bw);
+		pw.println(gson.toJson(games));
+
+		pw.flush();
+		pw.close();
+
 	}
 
 }

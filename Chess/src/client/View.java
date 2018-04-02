@@ -165,7 +165,7 @@ public class View extends JFrame implements MouseListener{
 	 * 
 	 * @param serverAdress 	Address of the server
 	 * @param port 			Port of the server
-	 * @see View#createGameWindow()
+	 * @see 					View#createGameWindow()
 	 */
 	public void startGame(String serverAdress, int port)  {
 		createGameWindow(); 
@@ -200,9 +200,9 @@ public class View extends JFrame implements MouseListener{
 	 * Renders the tiles and pieces
 	 * 
 	 * @param pieces 	List of pieces to render
-	 * @see View#firstRender
-	 * @see View#drawTiles(Graphics)
-	 * @see View#drawPieces(Graphics, ArrayList)
+	 * @see 				View#firstRender
+	 * @see 				View#drawTiles(Graphics)
+	 * @see 				View#drawPieces(Graphics, ArrayList)
 	 */
 	public void render(ArrayList<DrawPiece> pieces){  
 
@@ -230,9 +230,9 @@ public class View extends JFrame implements MouseListener{
 	 * Renders the tiles, pieces and markers
 	 * 
 	 * @param pieces 	List of pieces to render
-	 * @see View#drawTiles(Graphics)
-	 * @see View#drawMarkers(Graphics, Markers)
-	 * @see View#drawPieces(Graphics, ArrayList)
+	 * @see 				View#drawTiles(Graphics)
+	 * @see 				View#drawMarkers(Graphics, Markers)
+	 * @see 				View#drawPieces(Graphics, ArrayList)
 	 */
 	public void render(ArrayList<DrawPiece> pieces, Markers markers){  
 		Graphics2D g = (Graphics2D)backBuffer.getDrawGraphics();
@@ -296,7 +296,7 @@ public class View extends JFrame implements MouseListener{
 	 * Draws 64 tiles
 	 * 
 	 * @param g 		Graphics object getting drawn to
-	 * @see View#tileWidth
+	 * @see 			View#tileWidth
 	 */
 	private void drawTiles(Graphics g){
 		Color c = Color.DARK_GRAY;
@@ -317,7 +317,7 @@ public class View extends JFrame implements MouseListener{
 	 * 
 	 * @param g 			Graphics object getting drawn to
 	 * @param pieces		List of pieces that gets drawn
-	 * @see View#images
+	 * @see 				View#images
 	 */
 	private void drawPieces(Graphics g, ArrayList<DrawPiece> pieces) {
 		for (DrawPiece drawPiece : pieces) {

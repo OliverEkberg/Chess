@@ -18,7 +18,13 @@ import shared.Markers;
 import shared.PlayerColor;
 import shared.Positions;
 
-
+/**
+ * Chess server. Handles clients and direct IO. 
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class Server {
 	private ServerSocket serverSocket = null;
 
@@ -32,16 +38,35 @@ public class Server {
 
 	private ChessLogic logic;
 
+	/**
+	 * Creates a new {@link ServerView}
+	 */
 	public Server() {
 		sv = new ServerView(this);
 	}
 	
+	
+	/**
+	 * Starts the server at port
+	 * 
+	 * @param port			Requested port of the new server
+	 * @throws IOException
+	 * @see					Server#waitForPlayers()	
+	 * @see					ChessLogic#setGameRunning(boolean)			
+	 */
 	public void start(int port) throws IOException {
 		serverSocket = new ServerSocket(port);
 		logic = new ChessLogic();
 		waitForPlayers();
 		logic.setGameRunning(true);
 	}
+	
+	
+	/**
+	 * Sends a message to all {@link Client clients} and stops the server
+	 * 
+	 * @see	ChessLogic#setGameRunning(boolean)
+	 */
 	public void stop() {
 		logic.setGameRunning(false);
 		for (PlayerColor c : clients.keySet()) {
@@ -50,6 +75,14 @@ public class Server {
 		System.exit(0);
 	}
 
+	
+	/**
+	 * A thread that waits for new players to connect
+	 * 
+	 * @throws IOException
+	 * @see	Server#sendPositions(PlayerColor)
+	 * @see ServerView#showError(String)
+	 */
 	private void waitForPlayers() throws IOException {
 		new Thread()
 		{
@@ -84,8 +117,10 @@ public class Server {
 
 	/**
 	 * Handles incoming click from a client
-	 * @param json
-	 * @param client
+	 * 
+	 * @param json		Clock in json-format
+	 * @param client		The client sending the data
+	 * @see				ChessLogic
 	 */
 	public synchronized void fromClient(String json, Client client) {
 
@@ -110,7 +145,7 @@ public class Server {
 				client.setSelectedCoord(clickedCoordinate);
 
 				Markers markers = new Markers();
-				markers.setSelected(client.getSelectedCoord());
+				markers.setSelectedCoordinate(client.getSelectedCoord());
 
 
 				ArrayList<Coordinate> allMoves = logic.isMovableAll(logic.getPiece(client.getSelectedCoord()));
@@ -141,20 +176,28 @@ public class Server {
 				 */
 				if(logic.isMovable(clickedCoordinate,selectedPiece) && !logic.isChess(clickedCoordinate,selectedPiece)){
 					logic.move(selectedPiece,clickedCoordinate);
-					logic.switchTurn(client.getColor());
+					logic.switchTurn();
 					client.setSelectedCoord(clickedCoordinate);
 					sendPositions(clients);
 
+					//If the new playerturn can't make move
 					if(!logic.canMakeMove(logic.getPlayerTurn())) {
 						if(logic.isChess(logic.getPlayerTurn())) {
+							
+							//Send chess to both clients
 							for(PlayerColor key : clients.keySet()) {
 								clients.get(key).send(Commands.GameOver +"_"+"Chess mate. " + logic.getPlayerTurn() + " player lost!");
 							}
 						}else {
+							
+							//Send patt to both clients
 							for(PlayerColor key : clients.keySet()) {
 								clients.get(key).send(Commands.GameOver +"_"+"Patt. " + logic.getPlayerTurn() + " player lost!");
 							}
 						}
+						
+						//Saves and stops the game
+						logic.saveGame();
 						stop();
 
 					}
@@ -171,8 +214,10 @@ public class Server {
 
 
 	/**
-	 * Sends positions to client
-	 * @param client
+	 * Sends positions
+	 * 
+	 * @param client		Whom to send the positions
+	 * @see 				Positions
 	 */
 	private void sendPositions(Client client) {
 		Positions p = new Positions();
@@ -185,12 +230,14 @@ public class Server {
 		returnJson += gson.toJson(p);
 
 		client.send(returnJson);
-
 	}
 
+	
 	/**
 	 * Sends positions to all clients
-	 * @param clientMap
+	 * 
+	 * @param clientMap		Map of all clients
+	 * @see 					#sendPositions(Client)
 	 */
 	private void sendPositions(HashMap<PlayerColor, Client> clientMap) {
 		for (PlayerColor playerColor : clientMap.keySet()) {
@@ -199,12 +246,13 @@ public class Server {
 	}
 
 
+	/**
+	 * @return	The IP-address of the server
+	 */
 	public String getIp() {
 		try {
 			return InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		} catch (UnknownHostException e) {}
 		return null;
 	}
 

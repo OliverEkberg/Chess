@@ -15,6 +15,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+
+/**
+ * Graphical interface for the {@link Server server}
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class ServerView extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -26,6 +34,11 @@ public class ServerView extends JFrame {
 	private JButton startButton;
 	private JButton stopButton;
 	
+	/**
+	 * Creates the GUI
+	 * 
+	 * @param server		Reference to the controller
+	 */
 	public ServerView(Server server) {
 		
 		setSize(400,400);
@@ -50,6 +63,10 @@ public class ServerView extends JFrame {
 		stopButton = new JButton("Stop server");
 		
 		
+		/*
+		 * ActionListner for the startbutton. Will retrieve port and IP-address from the fields and start the server with these values.
+		 * Will also change the GUI.
+		 */
 		startButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -79,22 +96,29 @@ public class ServerView extends JFrame {
 			}
 		});
 		
+		/*
+		 * ActionListner for stop button. Will stop the server.
+		 */
 		stopButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				server.stop();
 			}
+			
 		});
 		
+
 		add(thePanel);
 		pack();
 		setVisible(true);
+		
 	}
 	
 
 	/**
 	 * Adds a component to a panel
+	 * 
 	 * @param thePanel
 	 * @param comp
 	 * @param xPos
@@ -121,10 +145,14 @@ public class ServerView extends JFrame {
 		thePanel.add(comp, gridConstraints);
 	}
 	
+	
+	/**
+	 * Displays an error for the server
+	 * 
+	 * @param msg	Error message to display
+	 */
 	public void showError(String msg) {
 		JOptionPane.showMessageDialog(thePanel, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
-	
-
 	
 }
