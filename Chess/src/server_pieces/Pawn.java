@@ -4,14 +4,24 @@ import shared.Coordinate;
 import shared.Direction;
 import shared.PlayerColor;
 
+/**
+ * Pawn piece
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class Pawn extends Piece {
 
 	
+
 	/**
-	 * Constructor
-	 * @param x
-	 * @param y
-	 * @param color
+	 * Sets the {@link Direction directions}
+	 * 
+	 * @param x		X-position
+	 * @param y		Y-position
+	 * @param color	Color of the piece
+	 * @see 			#setDirections()
 	 */
 	public Pawn(int x, int y, PlayerColor color){
 		super(new Coordinate(x,y), color);
@@ -32,7 +42,7 @@ public class Pawn extends Piece {
 	}
 	
 	/**
-	 * Sets the possible move directions
+	 * Set the possible move {@link Direction directions}
 	 */
 	private void setDirections(){
 		if(this.color.equals(PlayerColor.WHITE))

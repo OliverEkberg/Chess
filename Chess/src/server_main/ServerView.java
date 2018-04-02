@@ -51,7 +51,7 @@ public class ServerView extends JFrame {
 		ipLabel = new JLabel("Server IP: " + server.getIp());
 		addComp(thePanel, ipLabel, 0, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.NONE);
 		
-		portLabel = new JLabel("Insert host port (9001-65500): ");
+		portLabel = new JLabel("Insert desired host port (9001-65500): ");
 		addComp(thePanel, portLabel, 0, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.NONE);
 		
 		portField = new JTextField(5);

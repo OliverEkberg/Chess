@@ -26,8 +26,8 @@ public class ClientThread extends Thread{
 	 * Sets variables and creates a input and output
 	 * 
 	 * @param server		Reference to the server
-	 * @param socket
-	 * @param client
+	 * @param socket		Reference to socket
+	 * @param client		Reference to owner
 	 * @throws IOException
 	 */
 	public ClientThread(Server server, Socket socket, Client client) throws IOException {

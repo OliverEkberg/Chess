@@ -230,6 +230,7 @@ public class View extends JFrame implements MouseListener{
 	 * Renders the tiles, pieces and markers
 	 * 
 	 * @param pieces 	List of pieces to render
+	 * @param markers	Contains lists with markers to render
 	 * @see 				View#drawTiles(Graphics)
 	 * @see 				View#drawMarkers(Graphics, Markers)
 	 * @see 				View#drawPieces(Graphics, ArrayList)

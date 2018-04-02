@@ -130,7 +130,6 @@ public class ChessLogic {
 	 * @param coord 		Matching coordinate.
 	 * @return 			Matching piece or null
 	 * @see 				Piece#getCoordinate()
-	 * @see 				PlayerColor#equals(Coordinate)
 	 */
 	public Piece getPiece(Coordinate coord){
 		for(Piece piece : pieces) {
@@ -285,6 +284,7 @@ public class ChessLogic {
 
 
 	/**
+	 * @param p	The piece that is getting checked
 	 * @return	All the possible moves for a {@link Piece piece}
 	 */
 	public ArrayList<Coordinate> isMovableAll(Piece p){

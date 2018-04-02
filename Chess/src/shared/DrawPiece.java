@@ -1,15 +1,22 @@
 package shared;
 
+/**
+ * Helper class to keep track of information of a piece.
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class DrawPiece{
 	private Coordinate coord;
 	private PlayerColor playerColor;
 	private String type;
 
+	
 	/**
-	 * Constructor
-	 * @param coord
-	 * @param playerColor
-	 * @param type
+	 * @param coord			Position of the piece
+	 * @param playerColor	Color of the piece
+	 * @param type			The type of the piece
 	 */
 	public DrawPiece(Coordinate coord, PlayerColor playerColor, String type) {
 		this.coord = coord;
@@ -17,31 +24,29 @@ public class DrawPiece{
 		this.type = type;
 	}
 
-	/*
-	 * Setters and getters
+
+	/**
+	 * @return	The coordinate of the piece
 	 */
 	public Coordinate getCoord() {
 		return coord;
 	}
+	
 
-	public void setCoord(Coordinate coord) {
-		this.coord = coord;
-	}
-
+	/**	
+	 * @return	The color of the piece
+	 */
 	public PlayerColor getPlayerColor() {
 		return playerColor;
 	}
 
-	public void setPlayerColor(PlayerColor playerColor) {
-		this.playerColor = playerColor;
-	}
 
+	/**
+	 * @return	The type of the piece
+	 */
 	public String getType() {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
 	
 }
