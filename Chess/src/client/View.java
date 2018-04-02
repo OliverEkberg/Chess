@@ -32,12 +32,17 @@ import shared.Coordinate;
 import shared.DrawPiece;
 import shared.Markers;
 
-
+/**
+ * Handles all client-side IO. Is a GUI.
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class View extends JFrame implements MouseListener{  
 
 	private static final long serialVersionUID = 1L;
 	private Controller theController;
-
 
 	/*
 	 * Canvas related
@@ -45,6 +50,7 @@ public class View extends JFrame implements MouseListener{
 	private Canvas gameCanvas;  
 	private int canvasWidth = 800;
 	private int canvasHeight = 800;
+	private int tileWidth = 0;
 	private BufferStrategy backBuffer;
 
 	private HashMap<String, Image> images = new HashMap<>(); //Holds all images
@@ -52,23 +58,32 @@ public class View extends JFrame implements MouseListener{
 
 	private JPanel connectPanel;
 
+	
 	/**
-	 * Constructor
+	 * Starting up the menu
+	 * 
+	 * @see View#createStartupMenu()
 	 */
 	public View(){  
 		super("Chess Game");
+		tileWidth = canvasWidth/8;
 		setResizable(false);
 		loadImages();
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE); 
+		setDefaultCloseOperation(EXIT_ON_CLOSE); 
 		createStartupMenu();
 	}  
 	
+	
 	/**
 	 * Creates startup menu
+	 * 
+	 * @see View#addComp(JPanel, JComponent, int, int, int, int, int, int)
+	 * @see View#startGame(String, int)
+	 * @see View#displayError(String)
 	 */
 	private void createStartupMenu() {
 
-		this.setSize(300,400);
+		setSize(300,400);
 
 		connectPanel = new JPanel();
 		connectPanel.setLayout(new GridBagLayout());
@@ -84,6 +99,8 @@ public class View extends JFrame implements MouseListener{
 		addComp(connectPanel, portField, 1, 1, 2, 1, GridBagConstraints.WEST, GridBagConstraints.NONE);
 
 		JButton connect = new JButton("Connect");
+		
+		//Actionlistner for the connect button
 		connect.addActionListener(new ActionListener() {
 
 			@Override
@@ -105,14 +122,17 @@ public class View extends JFrame implements MouseListener{
 			}
 		});
 		addComp(connectPanel, connect, 1, 2, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.NONE);
-		this.add(connectPanel);
-		this.pack();
-		this.setVisible(true);
+		
+		add(connectPanel);
+		pack();
+		setVisible(true);
 
 	}
+	
 
 	/**
 	 * Adds a component to a panel
+	 * 
 	 * @param thePanel
 	 * @param comp
 	 * @param xPos
@@ -141,9 +161,11 @@ public class View extends JFrame implements MouseListener{
 
 
 	/**
-	 * Starts up the game
-	 * @param serverAdress
-	 * @param port
+	 * Starts up the game and creates the {@link Controller}
+	 * 
+	 * @param serverAdress 	Address of the server
+	 * @param port 			Port of the server
+	 * @see View#createGameWindow()
 	 */
 	public void startGame(String serverAdress, int port)  {
 		createGameWindow(); 
@@ -154,11 +176,10 @@ public class View extends JFrame implements MouseListener{
 	}
 
 
-
 	/**
-	 * Creates the game window
+	 * Creates the game window and the canvas
 	 */
-	public void createGameWindow(){  
+	private void createGameWindow(){  
 		this.setSize(canvasWidth, canvasHeight);
 		gameCanvas = new Canvas();  
 		gameCanvas.setSize(canvasWidth, canvasHeight);  
@@ -177,11 +198,14 @@ public class View extends JFrame implements MouseListener{
 
 	/**
 	 * Renders the tiles and pieces
-	 * @param pieces
+	 * 
+	 * @param pieces 	List of pieces to render
+	 * @see View#firstRender
+	 * @see View#drawTiles(Graphics)
+	 * @see View#drawPieces(Graphics, ArrayList)
 	 */
 	public void render(ArrayList<DrawPiece> pieces){  
 
-		
 		Graphics2D g = (Graphics2D)backBuffer.getDrawGraphics();
 
 		drawTiles(g);
@@ -200,11 +224,15 @@ public class View extends JFrame implements MouseListener{
 			render(pieces);
 		}
 	}  
+	
 
 	/**
 	 * Renders the tiles, pieces and markers
-	 * @param pieces
-	 * @param markers
+	 * 
+	 * @param pieces 	List of pieces to render
+	 * @see View#drawTiles(Graphics)
+	 * @see View#drawMarkers(Graphics, Markers)
+	 * @see View#drawPieces(Graphics, ArrayList)
 	 */
 	public void render(ArrayList<DrawPiece> pieces, Markers markers){  
 		Graphics2D g = (Graphics2D)backBuffer.getDrawGraphics();
@@ -217,9 +245,7 @@ public class View extends JFrame implements MouseListener{
 		backBuffer.show();
 	}  
 
-
-
-
+	
 	@Override
 	public synchronized void mouseClicked(MouseEvent e) {
 		int x = Math.floorDiv(e.getX(), 100);
@@ -246,6 +272,8 @@ public class View extends JFrame implements MouseListener{
 
 	/**
 	 * Loads all images
+	 * 
+	 * @see ResourceLoader#getImage(String)
 	 */
 	private void loadImages() {
 		images.put("BLACK_horse", ResourceLoader.getImage("BLACK_horse.png"));
@@ -265,10 +293,12 @@ public class View extends JFrame implements MouseListener{
 
 
 	/**
-	 * Draws 64 chess tiles
+	 * Draws 64 tiles
+	 * 
+	 * @param g 		Graphics object getting drawn to
+	 * @see View#tileWidth
 	 */
 	private void drawTiles(Graphics g){
-		int tileWidth = 100;
 		Color c = Color.DARK_GRAY;
 		for(int y = 0; y < 8; y++){
 			c = (c == Color.DARK_GRAY) ? Color.GRAY: Color.DARK_GRAY;
@@ -281,10 +311,13 @@ public class View extends JFrame implements MouseListener{
 		}
 	}
 
+	
 	/**
 	 * Draws all pieces
-	 * @param g
-	 * @param pieces
+	 * 
+	 * @param g 			Graphics object getting drawn to
+	 * @param pieces		List of pieces that gets drawn
+	 * @see View#images
 	 */
 	private void drawPieces(Graphics g, ArrayList<DrawPiece> pieces) {
 		for (DrawPiece drawPiece : pieces) {
@@ -293,25 +326,28 @@ public class View extends JFrame implements MouseListener{
 		}	
 	}
 
+	
 	/**
-	 * Draws all the markers
+	 * Draws all markers
+	 * 
+	 * @param g			Graphics object to draw upon
+	 * @param markers	Markers to draw
 	 */
 	private void drawMarkers(Graphics g, Markers markers) {
-		int tileWidth = 100;
 
 		/*
 		 * Selected marker
 		 */
-		int d = 90;
+		int d = (int) (tileWidth*0.9);
 		Color c = new Color(0,0,255,40);
 		g.setColor(c);
-		g.fillOval(markers.getSelected().x*tileWidth+tileWidth/2 - Math.round(d/2), markers.getSelected().y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
+		g.fillOval(markers.getSelectedCoordinate().x*tileWidth+tileWidth/2 - Math.round(d/2), markers.getSelectedCoordinate().y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
 
 		/*
 		 * Enemy markers
 		 */
 		for (Coordinate coord : markers.getEnemyMoves()) {
-			d = 90;
+			d = (int) (tileWidth*0.9);
 			c = new Color(255,0,0,40);
 			g.setColor(c);
 			g.fillOval(coord.x*tileWidth+tileWidth/2 - Math.round(d/2), coord.y*tileWidth+tileWidth/2 - Math.round(d/2), d, d);
@@ -331,19 +367,28 @@ public class View extends JFrame implements MouseListener{
 	}
 
 
-	public static void main(String[] args) throws UnknownHostException, InterruptedException, IOException {
-		new View();
-	}
 
 
-
-
-
+	/**
+	 * Outputs a game over message
+	 * 
+	 * @param message 	The message
+	 */
 	public void gameOver(String message) {
 		JOptionPane.showMessageDialog(View.this, message, "Game Over", JOptionPane.PLAIN_MESSAGE);
 	}
+	
+	/**
+	 * Outputs an error
+	 * 
+	 * @param error		Error information
+	 */
 	public void displayError(String error) {
 		JOptionPane.showMessageDialog(View.this, error, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public static void main(String[] args) throws UnknownHostException, InterruptedException, IOException {
+		new View();
 	}
 
 }

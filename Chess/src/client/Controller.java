@@ -16,14 +16,22 @@ import shared.DrawPiece;
 import shared.Markers;
 import shared.Positions;
 
+/**
+ * Handles all client-side logic
+ *
+ * @author  Oliver Ekberg
+ * @since   2018-04-01
+ * @version 1.0
+ */
 public class Controller extends Thread{
-
-
 
 	private Gson gson = new GsonBuilder().serializeNulls().create();
 
 	private View theView;
 
+	/*
+	 * Server stuff
+	 */
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out; 
@@ -32,6 +40,14 @@ public class Controller extends Thread{
 	private ArrayList<DrawPiece> positions;
 
 
+	/**
+	 * Connects to server
+	 * 
+	 * @param theView 	Reference to view
+	 * @param ipAdress 	Address of server
+	 * @param port 		Port of server
+	 * @see View#displayError(String)
+	 */
 	public Controller(View theView, String ipAdress, int port){
 		this.theView = theView;
 
@@ -43,21 +59,26 @@ public class Controller extends Thread{
 			theView.displayError("Could not connect to server.");
 			System.exit(0);
 		}
-
-
-
-
-
 	}
+	
 
 	/**
-	 * Converts clickedCoordinate to JSON and sends it to the server
-	 * @param clickedCoordinate
+	 * Converts coordinate to json and sends it to the server
+	 * 
+	 * @param clickedCoordinate  Coordinate to send
 	 */
 	public void clickHandler(Coordinate clickedCoordinate) {
 		out.println(gson.toJson(clickedCoordinate));
 	}
 
+	
+	/**
+	 * Waits for and handles incoming commands from the server
+	 * 
+	 * @see View#render(ArrayList)
+	 * @see View#render(ArrayList, Markers)
+	 * @see View#gameOver(String)
+	 */
 	public void run(){
 		try {
 			while(true){
@@ -68,7 +89,6 @@ public class Controller extends Thread{
 
 					Commands command = Commands.valueOf(msgFromServer.split("_")[0]); //Converts everything before "_" to a command.
 					String json = msgFromServer.split("_")[1]; //The data
-
 
 					switch (command) {
 					case Positions:  
@@ -94,7 +114,6 @@ public class Controller extends Thread{
 						socket.close();
 						System.exit(0);
 			
-
 					}
 
 
