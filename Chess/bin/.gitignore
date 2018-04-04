@@ -1,10 +1,2 @@
-/.DS_Store
-/game/
-/images/
-/pieces/
-/nzk/
-/json/
-/server_main/
 /server_pieces/
-/client/
-/shared/
+/server_main/

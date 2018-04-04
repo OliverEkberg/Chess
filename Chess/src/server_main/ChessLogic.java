@@ -192,6 +192,16 @@ public class ChessLogic {
 		addDraw(p.getCoordinate(), c);
 		removePiece(c);
 		p.setCoordinate(c);
+		
+		/*
+		 * If the piece is a pawn and have moved to the other side, transform it to a queen
+		 */
+		if(p instanceof Pawn && ((Pawn) p).isOnOtherSide()) {
+			PlayerColor pieceColor = p.getColor();
+			removePiece(c);
+			pieces.add(new Queen(c.x, c.y, pieceColor));
+			
+		}
 	}
 
 

@@ -42,6 +42,13 @@ public class Pawn extends Piece {
 	}
 	
 	/**
+	 * @return	If the pawn has reached the end of the board and is ready for transformation into a Queen
+	 */
+	public boolean isOnOtherSide() {
+		return coord.y == 7 || coord.y == 0;
+	}
+	
+	/**
 	 * Set the possible move {@link Direction directions}
 	 */
 	private void setDirections(){
