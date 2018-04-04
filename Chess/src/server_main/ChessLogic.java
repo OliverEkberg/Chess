@@ -200,7 +200,6 @@ public class ChessLogic {
 			PlayerColor pieceColor = p.getColor();
 			removePiece(c);
 			pieces.add(new Queen(c.x, c.y, pieceColor));
-			
 		}
 	}
 
