@@ -127,21 +127,35 @@ public class Server {
 		if(!logic.isGameRunning()) {
 			return;
 		}
+		
+
 
 		/*
 		 * Player needs to have turn
 		 */
 		if(logic.getPlayerTurn().equals(client.getColor())) {
 
+
 			//Parsing JSON
 			Coordinate clickedCoordinate = gson.fromJson(json, Coordinate.class);
-
+			
+			
+			/*
+			 * Clicking the selected coordinate will deselect it
+			 */
+			if(client.getSelectedCoord() != null && client.getSelectedCoord().equals(clickedCoordinate)) {
+				client.setSelectedCoord(null);
+				sendPositions(clients);
+				return;
+			}
+			
 
 			/*
 			 * If player owns clicked piece, it's possible moves will be collected
 			 */
 			if(logic.isOwnedBy(clickedCoordinate, client.getColor())) {
-
+				
+			
 				client.setSelectedCoord(clickedCoordinate);
 
 				Markers markers = new Markers();
@@ -177,7 +191,7 @@ public class Server {
 				if(logic.isMovable(clickedCoordinate,selectedPiece) && !logic.isChess(clickedCoordinate,selectedPiece)){
 					logic.move(selectedPiece,clickedCoordinate);
 					logic.switchTurn();
-					client.setSelectedCoord(clickedCoordinate);
+					client.setSelectedCoord(null);
 					sendPositions(clients);
 
 					//If the new playerturn can't make move
